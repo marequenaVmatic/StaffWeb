@@ -14,7 +14,7 @@ namespace StaffWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
+            if (Int32.Parse(DateTime.Now.Hour.ToString())>21)
             {
                 strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
                 Response.Write(strJson);
@@ -121,6 +121,38 @@ namespace StaffWeb
                                 RutaAbastecimiento,
                                 nus
                                 });
+                    }else
+                    {
+
+                        DBConn.RunDeleteQuery(" delete from [TaskDetail] where TaskType=@tasktype and TaskID=@taskid and CUS=@cus ", 
+                           new string[] {
+                                "@taskid",
+                                "@tasktype",
+                                "@cus"
+                               },
+                           new object[] {
+                                taskid,
+                                tasktype,
+                                cus
+                               });
+
+                        long dbComplete = DBConn.RunInsertQuery("insert into [TaskDetail](Taskid, TaskType, CUS, Quantity, RutaAbastecimiento, NUS) values (@taskid, @tasktype, @cus, @quantity, @RutaAbastecimiento, @nus)",
+                           new string[] {
+                                "@taskid",
+                                "@tasktype",
+                                "@cus",
+                                "@quantity",
+                                "@RutaAbastecimiento",
+                                "@nus"
+                               },
+                           new object[] {
+                                taskid,
+                                tasktype,
+                                cus,
+                                quantity,
+                                RutaAbastecimiento,
+                                nus
+                               });
                     }
                     strJson = string.Format("{{\"result\": \"{0}\"}}", "success");
 

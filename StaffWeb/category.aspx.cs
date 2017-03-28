@@ -17,7 +17,7 @@ namespace StaffWeb
             string userid = Request["userid"];
 
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
+            if (Int32.Parse(DateTime.Now.Hour.ToString())>21)
             {
                 strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
                 Response.Write(strJson);
@@ -75,7 +75,8 @@ namespace StaffWeb
 
                     string strCUS = DataSetUtil.RowStringValue(dsProducto, "CUS", i);
                     string strNUS = DataSetUtil.RowStringValue(dsProducto, "NUS", i);
-                    strJsonProducto += strSpliter + string.Format("{{\"CUS\": \"{0}\", \"NUS\": \"{1}\"}}", strCUS, strNUS);
+                    string strMAXP = DataSetUtil.RowStringValue(dsProducto, "MAXP", i);
+                    strJsonProducto += strSpliter + string.Format("{{\"CUS\": \"{0}\", \"NUS\": \"{1}\", \"MAXP\": \"{2}\"}}", strCUS, strNUS,strMAXP);
                     if (strSpliter == "") strSpliter = ",";
 
                 }

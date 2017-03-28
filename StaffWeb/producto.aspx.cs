@@ -14,7 +14,7 @@ namespace StaffWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
+            if (Int32.Parse(DateTime.Now.Hour.ToString())>21)
             {
                 strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
                 Response.Write(strJson);
@@ -38,7 +38,7 @@ namespace StaffWeb
                     Taskbusinesskey, 
                     TaskType
                     });*/
-                DataSet dsProducto = DBConn.RunSelectQuery("select r.NUS, r.CUS from [Producto_RutaAbastecimiento] pr inner join [Producto] r on pr.cus=r.cus where RutaAbastecimiento=@RutaAbastecimiento1 and TaskBusinessKey=@Taskbusinesskey1 and TaskType=@TaskType1 ORDER BY r.CUS",
+                DataSet dsProducto = DBConn.RunSelectQuery("select r.NUS, r.CUS, r.MAXP from [Producto_RutaAbastecimiento] pr inner join [Producto] r on pr.cus=r.cus where RutaAbastecimiento=@RutaAbastecimiento1 and TaskBusinessKey=@Taskbusinesskey1 and TaskType=@TaskType1 ORDER BY r.CUS",
                     new string[] {
                     "@RutaAbastecimiento1",
                     "@Taskbusinesskey1",
@@ -60,7 +60,8 @@ namespace StaffWeb
 
                     string strCus = DataSetUtil.RowStringValue(dsProducto, "CUS", i);
                     string strNus = DataSetUtil.RowStringValue(dsProducto, "NUS", i);
-                    strJson += strSpliter + string.Format("{{\"CUS\": \"{0}\", \"NUS\": \"{1}\"}}", strCus, strNus);
+                    string strMAXP = DataSetUtil.RowStringValue(dsProducto, "MAXP", i);
+                    strJson += strSpliter + string.Format("{{\"CUS\": \"{0}\", \"NUS\": \"{1}\", \"MAXP\": \"{2}\"}}", strCus, strNus, strMAXP);
                     if (strSpliter == "") strSpliter = ",";
 
                 }

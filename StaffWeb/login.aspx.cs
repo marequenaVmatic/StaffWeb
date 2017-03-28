@@ -14,13 +14,6 @@ namespace StaffWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
-            {
-                strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
-                Response.Write(strJson);
-            }
-            else
-            {
                 string userid = Request["userid"];
                 string password = Request["pwd"];
                 DataSet dbUser = DBConn.RunSelectQuery("select * from [User] where userid=@userid and password=@password",
@@ -52,7 +45,6 @@ namespace StaffWeb
                     strJson += string.Format("{{\"result\": \"{0}\"}}", "fail");
                 }
                 Response.Write(strJson);
-            }
         }
     }
 }

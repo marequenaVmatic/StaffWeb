@@ -14,7 +14,7 @@ namespace StaffWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
+            if (Int32.Parse(DateTime.Now.Hour.ToString())>21)
             {
                 strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
                 Response.Write(strJson);

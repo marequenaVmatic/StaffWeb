@@ -16,7 +16,7 @@ namespace StaffWeb
         protected void Page_Load(object sender, EventArgs e)
         {
             string strJson = "";
-            if (Int32.Parse(DateTime.Now.Hour.ToString()) >8)
+            if (Int32.Parse(DateTime.Now.Hour.ToString()) >21)
             {
                 strJson = string.Format("{{\"result\": \"{0}\"}}", "Fuerade Horario de sincronización");
                 Response.Write(strJson);
@@ -29,6 +29,7 @@ namespace StaffWeb
                     string taskid = "";
                     string capture_file = "";
                     string file_name = "";
+                    string file_type = "";
 
                     if (!string.IsNullOrEmpty(Request.Form["taskid"]))
                     {
@@ -40,11 +41,21 @@ namespace StaffWeb
                     }
                     if (!string.IsNullOrEmpty(Request.Form["file_name"]))
                     {
-                        file_name = Request.Form["file_name"];
-                    }
+                        Char delimiter = '/';
 
+                        //file_name = ((Request.Form["file_name"]).Split(delimiter))[5];  AQUI EL CAMBIO CODIGO ORIGINAL
+                        //CAMBIO DE SPLIT A LA ULTIMA POSICION 
+                        int ult = ((Request.Form["file_name"]).Split(delimiter)).Length;
+                        file_name = ((Request.Form["file_name"]).Split(delimiter))[ult-1];
+                    }
+                    if (!string.IsNullOrEmpty(Request.Form["file_type"]))
+                    {
+                        file_type = Request.Form["file_type"];
+                    }
                     DataSet dsCheck = DBConn.RunSelectQuery("SELECT * FROM log_file WHERE taskid={0} AND capture_file={1}",
                         new string[] { "@taskid", "@capture_file" }, new object[] { taskid, capture_file });
+
+
                     if (DataSetUtil.IsNullOrEmpty(dsCheck))
                     {
                         string strFileContent = "";
@@ -55,15 +66,15 @@ namespace StaffWeb
                             if (!Directory.Exists(strDirPath))
                                 Directory.CreateDirectory(strDirPath);
 
-                            string strFilePath = strDirPath + "\\" + capture_file + "_" + taskid + ".logfile";
+                            string strFilePath = strDirPath + "\\" + file_name + "_" + taskid + ".logfile";
                             hpf.SaveAs(strFilePath);
 
-                            file_name = "/LogFile/" + capture_file + "_" + taskid + ".logfile";
+                            file_name = "/LogFile/" + file_name + "_" + taskid + ".logfile";
 
                             using (StreamReader sr = new StreamReader(strFilePath))
                             {
                                 strFileContent = sr.ReadToEnd();
-                                if (capture_file.Contains("Spengler_ADM28"))
+                                if (file_name.Contains("Spengler_ADM28"))
                                 {
                                     string[] strPart = strFileContent.Split(new char[] { '\n' });
                                     for (int i = 0; i < strPart.Length; i++)
@@ -101,7 +112,7 @@ namespace StaffWeb
                                         }
                                     }
                                 }
-                                if (capture_file.Contains("Spengler_OPN"))
+                                if (file_name.Contains("Spengler_OPN"))
                                 {
                                     try
                                     {
@@ -122,10 +133,14 @@ namespace StaffWeb
                         string capture_file = Request["capture_file"];
                         string file_name = Request["file_name"];
                         */
+
+                        string contentfile = capture_file.Replace('\n',' ').Replace('\r',' ').Replace('?',' ').Replace('\0', ' ');
+
                         Response.Clear();
                         Response.ContentType = "text/json";
                         if (taskid != "")
                         {
+
                             long dbComplete = DBConn.RunInsertQuery("insert into [log_file](capture_file, file_name, taskid, file_content) values (@capture_file, @file_name, @taskid, @file_content)",
                                 new string[] {
                                     "@capture_file",
@@ -134,11 +149,13 @@ namespace StaffWeb
                                     "@file_content"
                                     },
                                 new object[] {
-                                    capture_file,
+                                    file_type,
                                     file_name,
                                     taskid,
-                                    strFileContent
+                                    contentfile
                                     });
+
+                            //strFileContent
                             strJson = string.Format("{{\"result\": \"{0}\"}}", "success");
                         }
                         else
